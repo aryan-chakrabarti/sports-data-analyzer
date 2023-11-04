@@ -77,26 +77,12 @@ void getPlayerPage(std::string* output, const std::string& playerId) {
     }
 }
 
-Scraper::Scraper(const std::string& playerName) : m_playerName(playerName) {}
-
-Scraper::Scraper(const Scraper& scraper) : m_playerName(scraper.m_playerName) {}
-
-Scraper::~Scraper() {}
-
-std::string& Scraper::playerName() {
-    return m_playerName;
-}
-
-const std::string& Scraper::playerName() const {
-    return m_playerName;
-}
-
 /**
  * Retrieves player data and returns as a strign.
  * If data is invalid, output is an empty string.
  * @returns player data as a string, empty if invalid.
 */
-std::string Scraper::getPlayerData() {
+std::string Scraper::getPlayerData(const std::string& playerName) {
     std::string output;
     getPlayerList(&output);
     return output;
