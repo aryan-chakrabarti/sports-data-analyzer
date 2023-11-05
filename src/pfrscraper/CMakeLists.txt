@@ -1,0 +1,2 @@
+add_library(pfrscrapercore pfrscraper_scraper.cpp pfrscraper_utils.cpp)
+target_link_libraries(pfrscrapercore curlpp curl)

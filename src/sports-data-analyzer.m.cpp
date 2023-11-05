@@ -14,8 +14,7 @@ int main(int argc, char** argv) {
         pfrscraper::Scraper scraper;
         std::string playerList(scraper.getPlayerData(player));
         if (playerList != "") {
-            std::cout << playerList << "\nThis is the data for " << player
-                      << "." << std::endl;
+            std::cout << "Got the data for " << player << "." << std::endl;
         }
     }
     return 0;

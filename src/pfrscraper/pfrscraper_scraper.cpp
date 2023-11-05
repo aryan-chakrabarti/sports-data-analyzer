@@ -21,8 +21,10 @@ std::string Scraper::generatePlayerUrl(const std::string& playerId) {
         return "";
     }
     std::ostringstream sstream;
+    const std::string YEAR("2023");
     sstream << "https://www.pro-football-reference.com/players/"
-            << playerId.at(0) << playerId << ".htm";
+            << playerId.at(0) << "/" << playerId << ".htm";
+    std::cout << "Going to: " << sstream.str() << "\n";
     return sstream.str();
 }
 
