@@ -162,10 +162,11 @@ int Scraper::getPlayerId(std::string* output, const std::string& playerName) {
 */
 int Scraper::scrapeData(std::string* output, const std::string& htmlResponse) {
     html::Document document(html::parse(htmlResponse));
+    // html::serialize_document(document);
     html::Collection scripts(document.getElementsByTag("script"));
     for (size_t i = 0; i < scripts.length(); i++) {
         html::Element elem(scripts.get(i));
-        html::serialize_element(elem.c_element());
+        html::serialize_element(elem);
     }
     *output = htmlResponse;
     return 0;
