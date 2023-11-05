@@ -2,8 +2,21 @@
 #include "pfrscraper_scraper.h"
 
 int main(int argc, char** argv) {
-    pfrscraper::Scraper scraper;
-    std::string playerList(scraper.getPlayerData("Calais Campbell"));
-    std::cout << playerList << "\nThis is the list of players." << std::endl;
+    (void)argc;
+    (void)argv;
+    while (true) {
+        std::string player;
+        std::cout << "Enter a player's name (type 'q' to quit): ";
+        std::getline(std::cin, player);
+        if (player == "q") {
+            break;
+        }
+        pfrscraper::Scraper scraper;
+        std::string playerList(scraper.getPlayerData(player));
+        if (playerList != "") {
+            std::cout << playerList << "\nThis is the data for " << player
+                      << "." << std::endl;
+        }
+    }
     return 0;
 }
