@@ -21,7 +21,7 @@ void serialize_document(Document& document) {
         lxb_dom_interface_node(document.c_document()),
         LXB_HTML_SERIALIZE_OPT_UNDEF, 0, serializer_callback, NULL);
     if (status != LXB_STATUS_OK) {
-        std::cout << "ERROR: Failed to serialize HTML tree" << std::endl;
+        std::cerr << "ERROR: Failed to serialize HTML tree" << std::endl;
     }
     return;
 }
@@ -32,7 +32,7 @@ void serialize_node(lxb_dom_node_t* node) {
     status = lxb_html_serialize_pretty_cb(node, LXB_HTML_SERIALIZE_OPT_UNDEF, 0,
                                           serializer_callback, NULL);
     if (status != LXB_STATUS_OK) {
-        std::cout << "ERROR: Failed to serialize HTML node" << std::endl;
+        std::cerr << "ERROR: Failed to serialize HTML node" << std::endl;
     }
 }
 

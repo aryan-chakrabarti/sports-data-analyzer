@@ -15,7 +15,7 @@ Document parse(const std::string& htmlResponse) {
     status = lxb_html_document_parse(document.c_document(), htmlStr,
                                      htmlResponse.size());
     if (status != LXB_STATUS_OK) {
-        std::cout << "ERROR: Failed to parse HTML." << std::endl;
+        std::cerr << "ERROR: Failed to parse HTML." << std::endl;
         return document;
     }
 

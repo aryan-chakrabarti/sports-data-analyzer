@@ -42,7 +42,7 @@ Collection Document::getElementsByTag(const std::string& tag) const {
         tag_str, tag.size());
 
     if (status != LXB_STATUS_OK) {
-        std::cout << "ERROR: Failed to get elements by name" << std::endl;
+        std::cerr << "ERROR: Failed to get elements by name" << std::endl;
     }
 
     return collection;

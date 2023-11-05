@@ -63,13 +63,13 @@ int Scraper::getResponseString(std::string* output,
     }
 
     catch (curlpp::RuntimeError& e) {
-        std::cout << "ERROR: " << e.what() << std::endl;
+        std::cerr << "ERROR: " << e.what() << std::endl;
         *output = "";
         return 1;
     }
 
     catch (curlpp::LogicError& e) {
-        std::cout << "ERROR: " << e.what() << std::endl;
+        std::cerr << "ERROR: " << e.what() << std::endl;
         *output = "";
         return 1;
     }
@@ -88,7 +88,6 @@ int Scraper::parsePlayerListString(PlayerIdMap* output,
         name = to_upper(name);
         output->insert(std::pair<std::string, std::string>(name, id));
     }
-    std::cout << std::endl;
     return 0;
 }
 
@@ -105,12 +104,12 @@ int Scraper::getPlayerList(PlayerIdMap* output) {
     std::string strResponse;
     int rc(getResponseString(&strResponse, requestUrl));
     if (rc) {
-        std::cout << "ERROR: Failed to get player list" << std::endl;
+        std::cerr << "ERROR: Failed to get player list" << std::endl;
         return 1;
     }
     rc = parsePlayerListString(output, strResponse);
     if (rc) {
-        std::cout << "ERROR: Failed to parse player list" << std::endl;
+        std::cerr << "ERROR: Failed to parse player list" << std::endl;
         return 1;
     }
     return 0;
@@ -127,7 +126,7 @@ int Scraper::getPlayerPage(std::string* output, const std::string& playerId) {
     const std::string url(generatePlayerUrl(playerId));
     int rc(getResponseString(output, url));
     if (rc) {
-        std::cout << "ERROR: Failed to get player page for " << playerId
+        std::cerr << "ERROR: Failed to get player page for " << playerId
                   << std::endl;
         return 1;
     }
@@ -145,7 +144,7 @@ int Scraper::getPlayerId(std::string* output, const std::string& playerName) {
     std::string playerNameUpper(to_upper(playerName));
     auto pair(s_playerIdMap.find(playerNameUpper));
     if (pair == s_playerIdMap.end()) {
-        std::cout << "ERROR: Failed to find player ID for name " << playerName
+        std::cerr << "ERROR: Failed to find player ID for name " << playerName
                   << std::endl;
         return 1;
     }
