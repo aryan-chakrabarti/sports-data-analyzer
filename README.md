@@ -14,5 +14,5 @@ cmake ..
 
 After building, make sure you are still in the build folder then run the following command:
 ```
-./src/pfrscraper.tsk
+./src/sports-data-analyzer.tsk
 ```
