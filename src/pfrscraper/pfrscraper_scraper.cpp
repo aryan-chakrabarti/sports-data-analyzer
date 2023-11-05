@@ -5,6 +5,9 @@
 #include <iostream>
 #include <sstream>
 #include <stdexcept>
+#include "html/html_collection.h"
+#include "html/html_parse.h"
+#include "html/html_serialize.h"
 #include "pfrscraper_utils.h"
 
 namespace pfrscraper {
@@ -158,6 +161,12 @@ int Scraper::getPlayerId(std::string* output, const std::string& playerName) {
  * @returns 0 if successful, 1 otherwise
 */
 int Scraper::scrapeData(std::string* output, const std::string& htmlResponse) {
+    html::Document document(html::parse(htmlResponse));
+    html::Collection scripts(document.getElementsByTag("script"));
+    for (size_t i = 0; i < scripts.length(); i++) {
+        html::Element elem(scripts.get(i));
+        html::serialize_element(elem.c_element());
+    }
     *output = htmlResponse;
     return 0;
 }
