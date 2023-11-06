@@ -1,5 +1,6 @@
 #include <iostream>
 #include "pfrscraper_scraper.h"
+#include "pfrscraper_utils.h"
 
 std::string getPlayerData(const std::string& player) {
     pfrscraper::Scraper scraper;
@@ -11,7 +12,8 @@ int main(int argc, char** argv) {
         for (int i = 1; i < argc; i++) {
             std::string playerList(getPlayerData(argv[i]));
             if (playerList != "") {
-                std::cout << "Got the data for " << argv[i] << "."
+                std::cout << "Got the data for "
+                          << pfrscraper::to_proper(argv[i]) << "."
                           << "\n";
             }
         }
@@ -28,7 +30,8 @@ int main(int argc, char** argv) {
         }
         std::string playerList(getPlayerData(player));
         if (playerList != "") {
-            std::cout << "Got the data for " << player << "."
+            std::cout << "Got the data for " << pfrscraper::to_proper(player)
+                      << "."
                       << "\n";
         }
     }

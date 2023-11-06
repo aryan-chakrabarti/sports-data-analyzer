@@ -161,11 +161,12 @@ int Scraper::getPlayerId(std::string* output, const std::string& playerName) {
 */
 int Scraper::scrapeData(std::string* output, const std::string& htmlResponse) {
     html::Document document(html::parse(htmlResponse));
-    // html::serialize_document(document);
-    html::Collection scripts(document.getElementsByTag("script"));
+
+    html::Collection scripts(document.getElementsByTag("table"));
+    std::cout << "Tables found:\n";
     for (size_t i = 0; i < scripts.length(); i++) {
         html::Element elem(scripts.get(i));
-        html::serialize_element(elem);
+        std::cout << elem.getId() << "\n";
     }
     *output = htmlResponse;
     return 0;
