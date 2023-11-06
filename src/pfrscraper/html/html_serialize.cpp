@@ -9,6 +9,7 @@ namespace html {
 
 lxb_status_t serializer_callback(const lxb_char_t* data, size_t len,
                                  void* ctx) {
+    (void)len;
     ((std::string*)ctx)->append(lxb_char_to_string(data));
     return LXB_STATUS_OK;
 }
