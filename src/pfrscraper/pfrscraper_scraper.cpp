@@ -190,18 +190,19 @@ Scraper::Scraper() noexcept(false) {
 KeyValueMap Scraper::getPlayerData(const std::string& playerName) {
     std::string playerId;
     KeyValueMap scrapedData;
+    const KeyValueMap emptyMap;
     int rc(getPlayerId(&playerId, playerName));
     if (rc) {
-        return scrapedData;
+        return emptyMap;
     }
     std::string htmloutput;
     rc = getPlayerPage(&htmloutput, playerId);
     if (rc) {
-        return scrapedData;
+        return emptyMap;
     }
     rc = scrapeData(&scrapedData, htmloutput);
     if (rc) {
-        return scrapedData;
+        return emptyMap;
     }
     return scrapedData;
 }
