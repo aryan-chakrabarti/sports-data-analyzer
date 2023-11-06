@@ -1,6 +1,7 @@
 #ifndef INCLUDE_HTML_SERIALIZE
 #define INCLUDE_HTML_SERIALIZE
 
+#include <string>
 #include "html_document.h"
 #include "html_element.h"
 
@@ -8,8 +9,8 @@ namespace pfrscraper {
 
 namespace html {
 
-void serialize_document(Document& document);
-void serialize_element(Element& element);
+std::string serialize_document(Document& document);
+std::string serialize_element(Element& element, bool verbose = true);
 
 }  // namespace html
 

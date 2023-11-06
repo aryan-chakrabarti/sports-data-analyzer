@@ -75,7 +75,7 @@ int Scraper::getResponseString(std::string* output,
     }
 }
 
-int Scraper::parsePlayerListString(PlayerIdMap* output,
+int Scraper::parsePlayerListString(KeyValueMap* output,
                                    const std::string& playerListString) {
     std::istringstream stream(playerListString);
     while (stream.good()) {
@@ -97,7 +97,7 @@ int Scraper::parsePlayerListString(PlayerIdMap* output,
  * @returns 0 if successful, 1 otherwise. If 1, output
  * remains untouched.
 */
-int Scraper::getPlayerList(PlayerIdMap* output) {
+int Scraper::getPlayerList(KeyValueMap* output) {
     const std::string requestUrl(
         "https://www.pro-football-reference.com/short/inc/"
         "players_search_list.csv");
@@ -159,16 +159,20 @@ int Scraper::getPlayerId(std::string* output, const std::string& playerName) {
  * @param htmlResponse The HTML page of the player
  * @returns 0 if successful, 1 otherwise
 */
-int Scraper::scrapeData(std::string* output, const std::string& htmlResponse) {
+int Scraper::scrapeData(KeyValueMap* output, const std::string& htmlResponse) {
     html::Document document(html::parse(htmlResponse));
 
     html::Collection scripts(document.getElementsByTag("table"));
-    std::cout << "Tables found:\n";
     for (size_t i = 0; i < scripts.length(); i++) {
         html::Element elem(scripts.get(i));
-        std::cout << elem.getId() << "\n";
+        std::string id(elem.getId());
+        if (id != "") {
+            output->insert(std::pair<std::string, std::string>(
+                id, html::serialize_element(elem)));
+        } else {
+            return 1;
+        }
     }
-    *output = htmlResponse;
     return 0;
 }
 
@@ -183,21 +187,21 @@ Scraper::Scraper() noexcept(false) {
     }
 }
 
-std::string Scraper::getPlayerData(const std::string& playerName) {
+KeyValueMap Scraper::getPlayerData(const std::string& playerName) {
     std::string playerId;
+    KeyValueMap scrapedData;
     int rc(getPlayerId(&playerId, playerName));
     if (rc) {
-        return "";
+        return scrapedData;
     }
     std::string htmloutput;
     rc = getPlayerPage(&htmloutput, playerId);
     if (rc) {
-        return "";
+        return scrapedData;
     }
-    std::string scrapedData;
     rc = scrapeData(&scrapedData, htmloutput);
     if (rc) {
-        return "";
+        return scrapedData;
     }
     return scrapedData;
 }

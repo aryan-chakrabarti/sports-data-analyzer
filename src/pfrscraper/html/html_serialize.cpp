@@ -1,6 +1,7 @@
 #include "html_serialize.h"
 #include <lexbor/html/html.h>
 #include <iostream>
+#include "html_utils.h"
 
 namespace pfrscraper {
 
@@ -8,36 +9,46 @@ namespace html {
 
 lxb_status_t serializer_callback(const lxb_char_t* data, size_t len,
                                  void* ctx) {
-    (void)ctx;
-    printf("%.*s", (int)len, (const char*)data);
-
+    ((std::string*)ctx)->append(lxb_char_to_string(data));
     return LXB_STATUS_OK;
 }
 
-void serialize_document(Document& document) {
+std::string serialize_tree(lxb_dom_node_t* node) {
     lxb_status_t status;
-
+    std::string serialized_tree;
     status = lxb_html_serialize_pretty_tree_cb(
-        lxb_dom_interface_node(document.c_document()),
-        LXB_HTML_SERIALIZE_OPT_UNDEF, 0, serializer_callback, NULL);
+        node, LXB_HTML_SERIALIZE_OPT_UNDEF, 0, serializer_callback,
+        &serialized_tree);
     if (status != LXB_STATUS_OK) {
         std::cerr << "ERROR: Failed to serialize HTML tree" << std::endl;
+        return "";
     }
-    return;
+    return serialized_tree;
 }
 
-void serialize_node(lxb_dom_node_t* node) {
+std::string serialize_node(lxb_dom_node_t* node) {
     lxb_status_t status;
-
-    status = lxb_html_serialize_pretty_cb(node, LXB_HTML_SERIALIZE_OPT_UNDEF, 0,
-                                          serializer_callback, NULL);
+    std::string serialized_node;
+    status =
+        lxb_html_serialize_pretty_cb(node, LXB_HTML_SERIALIZE_OPT_UNDEF, 0,
+                                     serializer_callback, &serialized_node);
     if (status != LXB_STATUS_OK) {
         std::cerr << "ERROR: Failed to serialize HTML node" << std::endl;
+        return "";
     }
+    return serialized_node;
 }
 
-void serialize_element(Element& element) {
-    serialize_node(lxb_dom_interface_node(element.c_element()));
+std::string serialize_document(Document& document) {
+    return serialize_tree(lxb_dom_interface_node(document.c_document()));
+}
+
+std::string serialize_element(Element& element, bool verbose) {
+    if (verbose) {
+        return serialize_tree(lxb_dom_interface_node(element.c_element()));
+    } else {
+        return serialize_node(lxb_dom_interface_node(element.c_element()));
+    }
 }
 
 }  // namespace html
