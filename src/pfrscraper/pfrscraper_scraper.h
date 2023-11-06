@@ -28,9 +28,9 @@ class Scraper {
     Scraper() noexcept(false);
 
     /**
-     * Retrieves player data and returns as a string.
-     * If data is invalid, output is an empty string.
-     * @returns player data as a string, empty if invalid.
+     * Retrieves player data and returns as a KeyValueMap (map of strings).
+     * If data is invalid, output is an empty map.
+     * @returns Player data as a KeyValueMap, empty if invalid.
     */
     KeyValueMap getPlayerData(const std::string& playerName);
 };
