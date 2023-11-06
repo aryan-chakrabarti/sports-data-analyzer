@@ -13,6 +13,9 @@ lxb_dom_element_t*& Element::c_element() {
 }
 
 std::string Element::getAttribute(const std::string& attrName) {
+    if (attrName == "id") {
+        return getId();
+    }
     /* Get value by qualified name */
     size_t value_len;
     const lxb_char_t* value = lxb_dom_element_get_attribute(
