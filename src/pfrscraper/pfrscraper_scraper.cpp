@@ -6,6 +6,7 @@
 #include <sstream>
 #include <stdexcept>
 #include "html/html_parse.h"
+#include "html/html_serialize.h"
 #include "pfrscraper_utils.h"
 
 namespace pfrscraper {
@@ -155,6 +156,7 @@ int scrapeTable(std::string* output, const html::Element& table) {
     if (captions.length() > 0) {
         *output = captions.get(0).getText();
     } else {
+        std::cerr << "ERROR: Failed to find caption for table" << std::endl;
         return 1;
     }
     return 0;
@@ -171,6 +173,11 @@ int Scraper::scrapeData(KeyValueMap* output, const std::string& htmlResponse) {
     const html::Document document(html::parse(htmlResponse));
 
     const html::Collection tables(html::getElementsByTag(document, "table"));
+    if (tables.length() == 0) {
+        std::cerr << "ERROR: Failed to scrape tables for document\n"
+                  << html::serialize_document(document) << std::endl;
+        return 1;
+    }
     for (size_t i = 0; i < tables.length(); i++) {
         const html::Element table(tables.get(i));
         std::string id(table.getId());
