@@ -28,16 +28,20 @@ Collection& Collection::operator=(Collection other) {
     return *this;
 }
 
+lxb_dom_collection_t* Collection::c_collection() const {
+    return m_collection;
+}
+
 lxb_dom_collection_t*& Collection::c_collection() {
     return m_collection;
 }
 
-Element Collection::get(size_t index) {
+Element Collection::get(size_t index) const {
     Element elem(lxb_dom_collection_element(m_collection, index));
     return elem;
 }
 
-size_t Collection::length() {
+size_t Collection::length() const {
     return lxb_dom_collection_length(m_collection);
 }
 

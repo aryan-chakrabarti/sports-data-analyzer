@@ -18,9 +18,10 @@ class Collection {
     Collection(const Collection& other);
     ~Collection();
     Collection& operator=(Collection other);
+    lxb_dom_collection_t* c_collection() const;
     lxb_dom_collection_t*& c_collection();
-    Element get(size_t index);
-    size_t length();
+    Element get(size_t index) const;
+    size_t length() const;
 };
 
 }  // namespace html

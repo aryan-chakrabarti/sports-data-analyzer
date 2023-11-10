@@ -17,6 +17,7 @@ class Document {
     Document();
     Document(const Document& other);
     ~Document();
+    lxb_html_document_t* c_document() const;
     lxb_html_document_t*& c_document();
     Document& operator=(Document other);
     Collection getElementsByTag(const std::string& tag) const;

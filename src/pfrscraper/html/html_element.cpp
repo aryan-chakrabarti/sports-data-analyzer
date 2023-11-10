@@ -12,7 +12,11 @@ lxb_dom_element_t*& Element::c_element() {
     return m_element;
 }
 
-std::string Element::getAttribute(const std::string& attrName) {
+lxb_dom_element_t* Element::c_element() const {
+    return m_element;
+}
+
+std::string Element::getAttribute(const std::string& attrName) const {
     if (attrName == "id") {
         return getId();
     }
@@ -28,7 +32,7 @@ std::string Element::getAttribute(const std::string& attrName) {
     return lxb_char_to_string(value);
 }
 
-std::string Element::getId() {
+std::string Element::getId() const {
     size_t value_len;
     const lxb_char_t* value(lxb_dom_element_id(m_element, &value_len));
     if (value == NULL) {
@@ -38,7 +42,7 @@ std::string Element::getId() {
     return lxb_char_to_string(value);
 }
 
-std::unordered_map<std::string, std::string> Element::getAttributes() {
+std::unordered_map<std::string, std::string> Element::getAttributes() const {
     /* Iterator */
     lxb_dom_attr_t* attr(lxb_dom_element_first_attribute(m_element));
     std::unordered_map<std::string, std::string> attribute_map;
@@ -58,6 +62,15 @@ std::unordered_map<std::string, std::string> Element::getAttributes() {
         attr = lxb_dom_element_next_attribute(attr);
     }
     return attribute_map;
+}
+
+std::string Element::getText() const {
+    size_t len;
+    lxb_dom_node_t* node(lxb_dom_interface_node(m_element));
+    lxb_char_t* text(lxb_dom_node_text_content(node, &len));
+    std::string strText(lxb_char_to_string(text));
+    lxb_dom_document_destroy_text(node->owner_document, text);
+    return strText;
 }
 
 }  // namespace html

@@ -15,9 +15,11 @@ class Element {
    public:
     Element(lxb_dom_element_t* element);
     lxb_dom_element_t*& c_element();
-    std::string getAttribute(const std::string& attrName);
-    std::string getId();
-    std::unordered_map<std::string, std::string> getAttributes();
+    lxb_dom_element_t* c_element() const;
+    std::string getAttribute(const std::string& attrName) const;
+    std::string getId() const;
+    std::unordered_map<std::string, std::string> getAttributes() const;
+    std::string getText() const;
 };
 
 }  // namespace html

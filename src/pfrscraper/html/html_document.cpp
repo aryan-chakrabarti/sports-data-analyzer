@@ -27,6 +27,10 @@ Document::~Document() {
     lxb_html_document_destroy(m_document);
 }
 
+lxb_html_document_t* Document::c_document() const {
+    return m_document;
+}
+
 lxb_html_document_t*& Document::c_document() {
     return m_document;
 }

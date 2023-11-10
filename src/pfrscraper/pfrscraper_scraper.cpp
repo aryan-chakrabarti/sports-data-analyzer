@@ -5,9 +5,7 @@
 #include <iostream>
 #include <sstream>
 #include <stdexcept>
-#include "html/html_collection.h"
 #include "html/html_parse.h"
-#include "html/html_serialize.h"
 #include "pfrscraper_utils.h"
 
 namespace pfrscraper {
@@ -152,6 +150,16 @@ int Scraper::getPlayerId(std::string* output, const std::string& playerName) {
     return 0;
 }
 
+int scrapeTable(std::string* output, const html::Element& table) {
+    html::Collection captions(html::getElementsByTag(table, "caption"));
+    if (captions.length() > 0) {
+        *output = captions.get(0).getText();
+    } else {
+        return 1;
+    }
+    return 0;
+}
+
 /**
  * Scrapes the html output of the player page and stores only important
  * player data into output.
@@ -160,15 +168,19 @@ int Scraper::getPlayerId(std::string* output, const std::string& playerName) {
  * @returns 0 if successful, 1 otherwise
 */
 int Scraper::scrapeData(KeyValueMap* output, const std::string& htmlResponse) {
-    html::Document document(html::parse(htmlResponse));
+    const html::Document document(html::parse(htmlResponse));
 
-    html::Collection scripts(document.getElementsByTag("table"));
-    for (size_t i = 0; i < scripts.length(); i++) {
-        html::Element elem(scripts.get(i));
-        std::string id(elem.getId());
+    const html::Collection tables(html::getElementsByTag(document, "table"));
+    for (size_t i = 0; i < tables.length(); i++) {
+        const html::Element table(tables.get(i));
+        std::string id(table.getId());
         if (id != "") {
-            output->insert(std::pair<std::string, std::string>(
-                id, html::serialize_element(elem)));
+            std::string caption;
+            int rc(scrapeTable(&caption, table));
+            if (rc) {
+                return rc;
+            }
+            output->insert(std::pair<std::string, std::string>(id, caption));
         } else {
             return 1;
         }

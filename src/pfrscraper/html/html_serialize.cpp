@@ -40,11 +40,11 @@ std::string serialize_node(lxb_dom_node_t* node) {
     return serialized_node;
 }
 
-std::string serialize_document(Document& document) {
+std::string serialize_document(const Document& document) {
     return serialize_tree(lxb_dom_interface_node(document.c_document()));
 }
 
-std::string serialize_element(Element& element, bool verbose) {
+std::string serialize_element(const Element& element, bool verbose) {
     if (verbose) {
         return serialize_tree(lxb_dom_interface_node(element.c_element()));
     } else {

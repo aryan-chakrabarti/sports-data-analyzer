@@ -9,8 +9,8 @@ namespace pfrscraper {
 
 namespace html {
 
-std::string serialize_document(Document& document);
-std::string serialize_element(Element& element, bool verbose = true);
+std::string serialize_document(const Document& document);
+std::string serialize_element(const Element& element, bool verbose = true);
 
 }  // namespace html
 
