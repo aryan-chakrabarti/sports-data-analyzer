@@ -21,7 +21,11 @@ void processPlayer(const std::string& player) {
              elem != playerData->map().end(); elem++) {
             std::cout << elem->second.name() << ":\n";
             for (auto row : elem->second.rows()) {
-                std::cout << "\t" << row.first << "\n";
+                std::cout << "\t" << row.first << ":\n";
+                for (auto col : elem->second.columns()) {
+                    std::cout << "\t\t" << col.first << ": "
+                              << *col.second.at(0) << "\n";
+                }
             }
         }
     }
