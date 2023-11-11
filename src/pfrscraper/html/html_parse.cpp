@@ -54,6 +54,20 @@ Collection getElementsByTag(const Element& element,
     return collection;
 }
 
+Collection getElementsByClass(const Element& element,
+                              const std::string& className) {
+    Collection collection(
+        lxb_dom_interface_node(element.c_element())->owner_document);
+    lxb_status_t status(lxb_dom_elements_by_class_name(
+        element.c_element(), collection.c_collection(),
+        string_to_lxb_char(className), className.size()));
+    if (status != LXB_STATUS_OK) {
+        std::cerr << "ERROR: Failed to get elements by class of " << className
+                  << std::endl;
+    }
+    return collection;
+}
+
 }  // namespace html
 
 }  // namespace pfrscraper

@@ -37,6 +37,12 @@ lxb_dom_collection_t*& Collection::c_collection() {
 }
 
 Element Collection::get(size_t index) const {
+    if (index >= length()) {
+        throw std::out_of_range(
+            "Index " + std::to_string(index) +
+            " out of range while accessing collection of length " +
+            std::to_string(length()));
+    }
     Element elem(lxb_dom_collection_element(m_collection, index));
     return elem;
 }

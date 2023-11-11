@@ -37,7 +37,7 @@ std::string Scraper::generatePlayerUrl(const std::string& playerId) {
  * @returns 0 if successful, 1 otherwise. Will set output to an empty
  *  string on failure.
 */
-int Scraper::getResponseString(std::string* output,
+int Scraper::getResponseString(std::string& output,
                                const std::string& requestUrl) {
     std::ostringstream response;
     try {
@@ -56,26 +56,27 @@ int Scraper::getResponseString(std::string* output,
         // Send request and get a result.
         request.perform();
 
-        *output = response.str();
+        output = response.str();
 
         return 0;
     }
 
     catch (curlpp::RuntimeError& e) {
         std::cerr << "ERROR: " << e.what() << std::endl;
-        *output = "";
+        output = "";
         return 1;
     }
 
     catch (curlpp::LogicError& e) {
         std::cerr << "ERROR: " << e.what() << std::endl;
-        *output = "";
+        output = "";
         return 1;
     }
 }
 
-int Scraper::parsePlayerListString(KeyValueMap* output,
-                                   const std::string& playerListString) {
+int Scraper::parsePlayerListString(
+    KeyValueMap<std::string, std::string>& output,
+    const std::string& playerListString) {
     std::istringstream stream(playerListString);
     while (stream.good()) {
         std::string id;
@@ -85,7 +86,7 @@ int Scraper::parsePlayerListString(KeyValueMap* output,
         std::string rest;
         std::getline(stream, rest);
         name = to_upper(name);
-        output->insert(std::pair<std::string, std::string>(name, id));
+        output.insert(std::pair<std::string, std::string>(name, id));
     }
     return 0;
 }
@@ -96,12 +97,12 @@ int Scraper::parsePlayerListString(KeyValueMap* output,
  * @returns 0 if successful, 1 otherwise. If 1, output
  * remains untouched.
 */
-int Scraper::getPlayerList(KeyValueMap* output) {
+int Scraper::getPlayerList(KeyValueMap<std::string, std::string>& output) {
     const std::string requestUrl(
         "https://www.pro-football-reference.com/short/inc/"
         "players_search_list.csv");
     std::string strResponse;
-    int rc(getResponseString(&strResponse, requestUrl));
+    int rc(getResponseString(strResponse, requestUrl));
     if (rc) {
         std::cerr << "ERROR: Failed to get player list" << std::endl;
         return 1;
@@ -121,7 +122,7 @@ int Scraper::getPlayerList(KeyValueMap* output) {
  * @returns 0 if successful, 1 otherwise. If 1, output is an empty
  * string.
 */
-int Scraper::getPlayerPage(std::string* output, const std::string& playerId) {
+int Scraper::getPlayerPage(std::string& output, const std::string& playerId) {
     const std::string url(generatePlayerUrl(playerId));
     int rc(getResponseString(output, url));
     if (rc) {
@@ -139,7 +140,7 @@ int Scraper::getPlayerPage(std::string* output, const std::string& playerId) {
  * @param playerName The player name to look up
  * @returns 0 if successful, 1 otherwise
 */
-int Scraper::getPlayerId(std::string* output, const std::string& playerName) {
+int Scraper::getPlayerId(std::string& output, const std::string& playerName) {
     std::string playerNameUpper(to_upper(playerName));
     auto pair(s_playerIdMap.find(playerNameUpper));
     if (pair == s_playerIdMap.end()) {
@@ -147,18 +148,72 @@ int Scraper::getPlayerId(std::string* output, const std::string& playerName) {
                   << std::endl;
         return 1;
     }
-    *output = pair->second;
+    output = pair->second;
     return 0;
 }
 
-int scrapeTable(std::string* output, const html::Element& table) {
+int scrapeTable(DataTable<std::string>& output, const html::Element& table) {
     html::Collection captions(html::getElementsByTag(table, "caption"));
+    std::string caption;
     if (captions.length() > 0) {
-        *output = captions.get(0).getText();
+        caption = captions.get(0).getText();
     } else {
         std::cerr << "ERROR: Failed to find caption for table" << std::endl;
         return 1;
     }
+    output.setName(caption);
+    html::Element body(html::getElementsByTag(table, "tbody").get(0));
+    html::Collection tableRows(html::getElementsByClass(body, "full_table"));
+    if (tableRows.length() == 0) {
+        std::cerr << "ERROR: Failed to find rows for table \"" << caption
+                  << "\" by class. Trying by tag..." << std::endl;
+        tableRows = html::getElementsByTag(body, "tr");
+        if (tableRows.length() == 0) {
+            std::cerr << "ERROR: Failed to find rows for table \"" << caption
+                      << "\" by tag. " << std::endl;
+            return 1;
+        }
+    }
+    for (size_t i = 0; i < tableRows.length(); i++) {
+        html::Element row(tableRows.get(i));
+        html::Collection columns(html::getElementsByTag(row, "td"));
+        std::vector<std::pair<std::string, std::string>> dataRow;
+        for (size_t j = 0; j < columns.length(); j++) {
+            html::Element col(columns.get(j));
+            std::string dataStat(col.getAttribute("data-stat"));
+            std::string dataValue(col.getText());
+            dataRow.emplace_back(
+                std::pair<std::string, std::string>(dataStat, dataValue));
+        }
+        std::string rowName;
+        if (caption == "Advanced Passing Table") {
+            int x = 1;
+            x++;
+        }
+        auto attributes(row.getAttributes());
+        for (auto attr : attributes) {
+            if (attr.first == "id") {
+                rowName = attr.second;
+                break;
+            } else if (attr.first == "csk") {
+                rowName = "Year: " + attr.second;
+                break;
+            }
+        }
+        if (rowName == "") {
+            // Get text inside <a> tag, which is inside the table header (<th>) tag.
+            html::Element date(html::getElementsByTag(row, "th").get(0));
+            html::Collection hyperlinks(html::getElementsByTag(date, "a"));
+            if (hyperlinks.length() == 0) {
+                std::cerr << "ERROR: Failed to find name of row for table \""
+                          << caption << std::endl;
+                return 1;
+            }
+            rowName = "Year: " + hyperlinks.get(0).getText();
+        }
+        output.add(rowName, dataRow);
+    }
+
     return 0;
 }
 
@@ -169,7 +224,8 @@ int scrapeTable(std::string* output, const html::Element& table) {
  * @param htmlResponse The HTML page of the player
  * @returns 0 if successful, 1 otherwise
 */
-int Scraper::scrapeData(KeyValueMap* output, const std::string& htmlResponse) {
+int Scraper::scrapeData(DataTableMap<std::string>& output,
+                        const std::string& htmlResponse) {
     const html::Document document(html::parse(htmlResponse));
 
     const html::Collection tables(html::getElementsByTag(document, "table"));
@@ -182,12 +238,13 @@ int Scraper::scrapeData(KeyValueMap* output, const std::string& htmlResponse) {
         const html::Element table(tables.get(i));
         std::string id(table.getId());
         if (id != "") {
-            std::string caption;
-            int rc(scrapeTable(&caption, table));
+            using Table = DataTable<std::string>;
+            Table dataTable;
+            int rc(scrapeTable(dataTable, table));
             if (rc) {
                 return rc;
             }
-            output->insert(std::pair<std::string, std::string>(id, caption));
+            output.map().insert(std::pair<std::string, Table>(id, dataTable));
         } else {
             return 1;
         }
@@ -199,29 +256,32 @@ Scraper::Scraper() noexcept(false) {
 
     // Initialize player ID map if not done.
     if (s_playerIdMap.empty()) {
-        int rc(getPlayerList(&s_playerIdMap));
+        int rc(getPlayerList(s_playerIdMap));
         if (rc) {
             throw std::runtime_error("Cannot initialize player list.");
         }
     }
 }
 
-KeyValueMap Scraper::getPlayerData(const std::string& playerName) {
+std::shared_ptr<DataTableMap<std::string>> Scraper::getPlayerData(
+    const std::string& playerName) {
+    using TableMap = DataTableMap<std::string>;
     std::string playerId;
-    KeyValueMap scrapedData;
-    const KeyValueMap emptyMap;
-    int rc(getPlayerId(&playerId, playerName));
+    std::shared_ptr<TableMap> scrapedData(
+        std::make_shared<TableMap>(DataTableMap<std::string>()));
+    const DataTableMap<std::string> emptyMap;
+    int rc(getPlayerId(playerId, playerName));
     if (rc) {
-        return emptyMap;
+        return std::make_shared<DataTableMap<std::string>>(emptyMap);
     }
     std::string htmloutput;
-    rc = getPlayerPage(&htmloutput, playerId);
+    rc = getPlayerPage(htmloutput, playerId);
     if (rc) {
-        return emptyMap;
+        return std::make_shared<DataTableMap<std::string>>(emptyMap);
     }
-    rc = scrapeData(&scrapedData, htmloutput);
+    rc = scrapeData(*scrapedData, htmloutput);
     if (rc) {
-        return emptyMap;
+        return std::make_shared<DataTableMap<std::string>>(emptyMap);
     }
     return scrapedData;
 }

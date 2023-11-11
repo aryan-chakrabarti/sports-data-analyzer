@@ -1,21 +1,28 @@
 #include <fstream>
 #include <iostream>
+#include <memory>
 #include "pfrscraper_scraper.h"
 #include "pfrscraper_utils.h"
 
-pfrscraper::KeyValueMap getPlayerData(const std::string& player) {
+std::shared_ptr<pfrscraper::DataTableMap<std::string>> getPlayerData(
+    const std::string& player) {
     pfrscraper::Scraper scraper;
     return scraper.getPlayerData(player);
 }
 
 void processPlayer(const std::string& player) {
-    std::cout << "Getting data for " << pfrscraper::to_proper(player)
-              << ":\n\n";
-    pfrscraper::KeyValueMap playerData(getPlayerData(player));
-    if (!playerData.empty()) {
-        for (auto iter(playerData.begin()); iter != playerData.end(); iter++) {
-            std::cout << "Found data for " << iter->first << ":\n";
-            std::cout << iter->second << "\n\n";
+    typedef pfrscraper::DataTableMap<std::string> TableMap;
+    std::string properName(pfrscraper::to_proper(player));
+    std::cout << "Getting data for " << properName << ":\n\n";
+    std::shared_ptr<TableMap> playerData(getPlayerData(player));
+    if (!playerData->map().empty()) {
+        std::cout << "Found data for " << properName << ":\n\n";
+        for (auto elem(playerData->map().begin());
+             elem != playerData->map().end(); elem++) {
+            std::cout << elem->second.name() << ":\n";
+            for (auto row : elem->second.rows()) {
+                std::cout << "\t" << row.first << "\n";
+            }
         }
     }
 }

@@ -23,6 +23,9 @@ Collection getElementsByTag(const Document& document,
                             const std::string& tagName);
 Collection getElementsByTag(const Element& element, const std::string& tagName);
 
+Collection getElementsByClass(const Element& element,
+                              const std::string& className);
+
 }  // namespace html
 
 }  // namespace pfrscraper
