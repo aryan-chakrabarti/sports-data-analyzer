@@ -209,7 +209,7 @@ int scrapeTable(DataTable<std::string>& output, const html::Element& table) {
                           << caption << std::endl;
                 return 1;
             }
-            rowName = "Year: " + hyperlinks.get(0).getText();
+            rowName = "Time: " + hyperlinks.get(0).getText();
         }
         output.add(rowName, dataRow);
     }
