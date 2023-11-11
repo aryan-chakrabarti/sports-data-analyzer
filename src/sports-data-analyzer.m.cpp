@@ -20,12 +20,14 @@ void processPlayer(const std::string& player) {
         for (auto elem(playerData->map().begin());
              elem != playerData->map().end(); elem++) {
             std::cout << elem->second.name() << ":\n";
+            size_t index(0);
             for (auto row : elem->second.rows()) {
                 std::cout << "\t" << row.first << ":\n";
                 for (auto col : elem->second.columns()) {
                     std::cout << "\t\t" << col.first << ": "
-                              << *col.second.at(0) << "\n";
+                              << *col.second.at(index) << "\n";
                 }
+                index++;
             }
         }
     }
