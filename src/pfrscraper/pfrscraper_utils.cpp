@@ -11,9 +11,9 @@ std::string to_upper(std::string str) {
 }
 
 std::string to_proper(std::string str) {
-    bool wasSpace = true;
+    bool wasSpace(true);
     for (auto& c : str) {
-        bool isSeparator = c == ' ' || c == '\n' || c == '\t';
+        bool isSeparator(c == ' ' || c == '\n' || c == '\t');
         if (wasSpace && !isSeparator) {
             c = (char)std::toupper(c);
             wasSpace = false;

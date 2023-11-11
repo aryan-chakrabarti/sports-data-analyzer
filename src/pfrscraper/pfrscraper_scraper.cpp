@@ -186,10 +186,6 @@ int scrapeTable(DataTable<std::string>& output, const html::Element& table) {
                 std::pair<std::string, std::string>(dataStat, dataValue));
         }
         std::string rowName;
-        if (caption == "Advanced Passing Table") {
-            int x = 1;
-            x++;
-        }
         auto attributes(row.getAttributes());
         for (auto attr : attributes) {
             if (attr.first == "id") {
