@@ -7,6 +7,7 @@ Outside of the C++ standard library, this project requires the following librari
 curlpp // For getting sports data
 curl // Dependency of curlpp
 lexbor // For parsing HTML
+boost // For advanced C++ algorithms
 ```
 
 # How To Run
