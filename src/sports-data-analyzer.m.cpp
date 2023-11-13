@@ -70,7 +70,7 @@ std::string removeExtraWhitespace(const std::string& str) {
     return output.str();
 }
 
-void processCommand(std::string command, PlayerData& data) {
+void processCommand(const std::string& command, PlayerData& data) {
     std::string cleanedCommand(removeExtraWhitespace(command));
     boost::to_lower(cleanedCommand);
     std::vector<std::string> parsedArgs;
