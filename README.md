@@ -9,18 +9,11 @@ curl // Dependency of curlpp
 lexbor // For parsing HTML
 ```
 
-# How To Build
-
-To build, ensure you have the curlpp and curl libraries installed. Then, cd to the sports-data-analyzer directory run the following commands:
-```
-mkdir build
-cd build
-cmake ..
-```
-
 # How To Run
 
-After building, make sure you are still in the build folder then run the following command:
+To run, make sure you are in the root project folder then run the following command:
 ```
-./src/sports-data-analyzer.tsk
+./launch.sh
 ```
+
+This script will automatically build and run the analyzer in your terminal.
