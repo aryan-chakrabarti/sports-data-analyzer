@@ -5,6 +5,7 @@
 #include <iostream>
 #include <sstream>
 #include <stdexcept>
+#include "boost/algorithm/string.hpp"
 #include "html/html_parse.h"
 #include "html/html_serialize.h"
 #include "pfrscraper_utils.h"
@@ -85,7 +86,7 @@ int Scraper::parsePlayerListString(
         std::getline(stream, name, ',');
         std::string rest;
         std::getline(stream, rest);
-        name = to_upper(name);
+        boost::to_upper(name);
         output.insert(std::pair<std::string, std::string>(name, id));
     }
     return 0;
@@ -141,7 +142,7 @@ int Scraper::getPlayerPage(std::string& output, const std::string& playerId) {
  * @returns 0 if successful, 1 otherwise
 */
 int Scraper::getPlayerId(std::string& output, const std::string& playerName) {
-    std::string playerNameUpper(to_upper(playerName));
+    std::string playerNameUpper(boost::to_upper_copy(playerName));
     auto pair(s_playerIdMap.find(playerNameUpper));
     if (pair == s_playerIdMap.end()) {
         std::cerr << "ERROR: Failed to find player ID for name " << playerName

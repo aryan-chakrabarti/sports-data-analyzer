@@ -3,13 +3,6 @@
 #include <iostream>
 namespace pfrscraper {
 
-std::string to_upper(std::string str) {
-    for (auto& c : str) {
-        c = (char)std::toupper(c);
-    }
-    return str;
-}
-
 std::string to_proper(std::string str) {
     bool wasSpace(true);
     for (auto& c : str) {

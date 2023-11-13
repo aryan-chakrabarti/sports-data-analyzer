@@ -54,10 +54,9 @@ void printTable(const pfrscraper::DataTable<std::string>& table,
 }
 
 void processCommand(const std::string& command, PlayerData& data) {
-    std::string lowerCasedCommand(command);
-    boost::to_lower(lowerCasedCommand);
     std::vector<std::string> parsedArgs;
-    boost::split(parsedArgs, lowerCasedCommand, boost::is_any_of("\t "));
+    boost::split(parsedArgs, boost::to_lower_copy(command),
+                 boost::is_any_of("\t "));
     if (parsedArgs.size() == 0) {
         return;
     }
