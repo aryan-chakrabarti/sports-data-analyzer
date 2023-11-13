@@ -25,23 +25,31 @@ PlayerData processPlayer(const std::string& player) {
     return playerData;
 }
 
-void printTable(const pfrscraper::DataTable<std::string>& table) {
+void printTable(const pfrscraper::DataTable<std::string>& table,
+                bool rowMode = true) {
     auto rows = table.rows();
-    bool printedCols(false);
-    for (auto row(rows.begin()); row != rows.end(); row++) {
-        if (!printedCols) {
-            std::cout << "\t\t\t";
-            std::for_each(
-                row->second->begin(), row->second->end(),
-                [](auto& elem) { std::cout << "\t\t" << elem.first; });
+    if (rowMode) {
+        for (auto row(rows.begin()); row != rows.end(); row++) {
+            std::cout << row->first << "\n";
+            std::for_each(row->second->begin(), row->second->end(),
+                          [](auto& elem) {
+                              std::cout << "\t" << elem.first << ": "
+                                        << elem.second << "\n";
+                          });
             std::cout << "\n";
-            printedCols = true;
         }
-        std::cout << row->first;
-        std::for_each(row->second->begin(), row->second->end(), [](auto& elem) {
-            std::cout << "\t\t\t\t" << elem.second;
-        });
-        std::cout << "\n";
+    } else {
+        for (size_t col(0); col != table.table().at(0)->size(); col++) {
+            bool printedCol(false);
+            for (auto row(rows.begin()); row != rows.end(); row++) {
+                if (!printedCol) {
+                    std::cout << row->second->at(col).first << ":\n";
+                    printedCol = true;
+                }
+                std::cout << "\t" << row->first << "\t\t"
+                          << row->second->at(col).second << "\n";
+            }
+        }
     }
 }
 
@@ -54,12 +62,18 @@ void processCommand(const std::string& command, PlayerData& data) {
     std::string function(parsedArgs.at(0));
     boost::to_lower(function);
     if (function == "help" || function == "h") {
-        std::cout << "Functions:\n\nLOAD [Player Name]: Loads the player with "
-                     "name [Player Name] into the current terminal. Make sure "
-                     "you specify both first and last name.\n\nSHOW: Shows all "
-                     "tables of data associated with the player loaded.\n\nGET "
-                     "[Table Name]: Gets the table with name 'Table Name'. "
-                     "This name can be found with the 'SHOW' function.\n";
+        std::cout
+            << "Functions:\n\nLOAD [Player Name]: Loads the player with "
+               "name [Player Name] into the current terminal. Make sure "
+               "you specify both first and last name.\n\nSHOW: Shows all "
+               "tables of data associated with the player loaded.\n\nGET "
+               "[Table Name] [View Option = ROW]: Gets the table with name "
+               "'Table Name'. "
+               "This name can be found with the 'SHOW' function. Optionally "
+               "select where to see the datapoints categorized by ROW (shows "
+               "stats for a specific point in time) or "
+               "COL (shows one stat over a period of time). Default is by row "
+               "(ROW).\n";
     } else if (function == "load") {
         std::string joinedArgs(boost::algorithm::join(
             std::vector<std::string>(parsedArgs.begin() + 1, parsedArgs.end()),
@@ -83,17 +97,41 @@ void processCommand(const std::string& command, PlayerData& data) {
                       << std::endl;
             return;
         }
-        if (parsedArgs.size() != 2) {
-            std::cerr << "Please select only one table to show." << std::endl;
+        if (parsedArgs.size() == 2) {
+            const auto& dataTable(data->map().find(parsedArgs.at(1)));
+            if (dataTable == data->map().end()) {
+                std::cerr << "Could not find data table with name "
+                          << parsedArgs.at(1) << std::endl;
+                return;
+            }
+            printTable(dataTable->second);
+        } else if (parsedArgs.size() == 3) {
+            bool rowMode(true);
+            if (parsedArgs.at(2) == "col") {
+                rowMode = false;
+            } else if (parsedArgs.at(2) != "row") {
+                std::cerr << "Invalid view selection. Please choose "
+                             "either ROW to categorize data by time or COL by "
+                             "stat over time."
+                          << std::endl;
+                return;
+            }
+            const auto& dataTable(data->map().find(parsedArgs.at(1)));
+            if (dataTable == data->map().end()) {
+                std::cerr << "Could not find data table with name "
+                          << parsedArgs.at(1) << std::endl;
+                return;
+            }
+            printTable(dataTable->second, rowMode);
+        } else {
+            std::cerr
+                << "Invalid number of arguments. Please enter a table "
+                   "name then optionally ROW if you want to see it "
+                   "organized by time period, or COL for each stat over time."
+                << std::endl;
             return;
         }
-        const auto& dataTable(data->map().find(parsedArgs.at(1)));
-        if (dataTable == data->map().end()) {
-            std::cerr << "Could not find data table with name "
-                      << parsedArgs.at(1) << std::endl;
-            return;
-        }
-        printTable(dataTable->second);
+
     } else {
         std::cerr << "ERROR: Invalid command. Please try again." << std::endl;
     }
