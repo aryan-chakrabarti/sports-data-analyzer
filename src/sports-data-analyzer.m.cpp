@@ -195,7 +195,7 @@ int main(int argc, char** argv) {
             std::cout << "> ";
             std::getline(std::cin, command);
             boost::algorithm::trim(command);
-            if (command == "q") {
+            if (command == "q" || std::cin.eof()) {
                 break;
             }
             processCommand(command, player);
