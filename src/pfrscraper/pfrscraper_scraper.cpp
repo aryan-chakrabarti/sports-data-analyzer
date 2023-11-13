@@ -165,7 +165,7 @@ int scrapeTable(DataTable<std::string>& output, const html::Element& table) {
     html::Element body(html::getElementsByTag(table, "tbody").get(0));
     html::Collection tableRows(html::getElementsByClass(body, "full_table"));
     if (tableRows.length() == 0) {
-        std::cerr << "ERROR: Failed to find rows for table \"" << caption
+        std::cerr << "WARNING: Failed to find rows for table \"" << caption
                   << "\" by class. Trying by tag..." << std::endl;
         tableRows = html::getElementsByTag(body, "tr");
         if (tableRows.length() == 0) {

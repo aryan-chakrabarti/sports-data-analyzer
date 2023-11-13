@@ -54,8 +54,14 @@ void processCommand(const std::string& command, PlayerData& data) {
     }
     std::string function(parsedArgs.at(0));
     boost::to_lower(function);
-
-    if (function == "load") {
+    if (function == "help" || function == "h") {
+        std::cout << "Functions:\n\nLOAD [Player Name]: Loads the player with "
+                     "name [Player Name] into the current terminal. Make sure "
+                     "you specify both first and last name.\n\nSHOW: Shows all "
+                     "tables of data associated with the player loaded.\n\nGET "
+                     "[Table Name]: Gets the table with name 'Table Name'. "
+                     "This name can be found with the 'SHOW' function.\n";
+    } else if (function == "load") {
         std::string joinedArgs(boost::algorithm::join(
             std::vector<std::string>(parsedArgs.begin() + 1, parsedArgs.end()),
             " "));
@@ -111,7 +117,8 @@ int main(int argc, char** argv) {
     } else if (argc == 1) {
         std::cout
             << "Welcome to the football player data analyzer.\nStart with the "
-               "'load' command to load a player's info.\nType 'q' to quit.\n";
+               "'LOAD' command to load a player's info.\nType 'HELP' for help, "
+               "'q' to quit.\n";
         PlayerData data;
         while (true) {
             std::string command;
