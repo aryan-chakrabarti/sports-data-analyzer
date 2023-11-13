@@ -43,7 +43,6 @@ void printTable(const pfrscraper::DataTable<std::string>& table) {
         });
         std::cout << "\n";
     }
-    std::cout << std::endl;
 }
 
 void processCommand(const std::string& command, PlayerData& data) {
@@ -98,6 +97,7 @@ void processCommand(const std::string& command, PlayerData& data) {
     } else {
         std::cerr << "ERROR: Invalid command. Please try again." << std::endl;
     }
+    std::cout << "\n";
 }
 
 int main(int argc, char** argv) {
