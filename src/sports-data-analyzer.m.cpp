@@ -59,7 +59,7 @@ std::string removeExtraWhitespace(const std::string& str) {
     for (const auto& c : str) {
         if (c == ' ' || c == '\t') {
             if (!lastWasSpace) {
-                output << c;
+                output << ' ';
             }
             lastWasSpace = true;
         } else {
@@ -70,8 +70,11 @@ std::string removeExtraWhitespace(const std::string& str) {
     return output.str();
 }
 
-void processCommand(const std::string& command, PlayerData& data) {
+void processCommand(const std::string& command,
+                    std::pair<std::string, PlayerData>& player) {
     std::string cleanedCommand(removeExtraWhitespace(command));
+    PlayerData& data(player.second);
+    std::string& playerName(player.first);
     boost::to_lower(cleanedCommand);
     std::vector<std::string> parsedArgs;
     boost::split(parsedArgs, cleanedCommand, boost::is_any_of(" "));
@@ -104,6 +107,7 @@ void processCommand(const std::string& command, PlayerData& data) {
         PlayerData playerInfo(processPlayer(joinedArgs));
         if (playerInfo != nullptr && !playerInfo->map().empty()) {
             data = playerInfo;
+            playerName = pfrscraper::to_proper(joinedArgs);
         }
     } else if (function == "show") {
         if (data == nullptr || data->map().empty()) {
@@ -111,6 +115,7 @@ void processCommand(const std::string& command, PlayerData& data) {
                       << std::endl;
             return;
         }
+        std::cout << "\nShowing tables for " << playerName << ":\n\n";
         std::for_each(
             data->map().begin(), data->map().end(),
             [](auto& datapair) { std::cout << datapair.first << "\n"; });
@@ -183,6 +188,8 @@ int main(int argc, char** argv) {
                "for help, "
                "'q' to quit.\n";
         PlayerData data;
+        std::string playerName;
+        std::pair<std::string, PlayerData> player(playerName, data);
         while (true) {
             std::string command;
             std::cout << "> ";
@@ -191,7 +198,7 @@ int main(int argc, char** argv) {
             if (command == "q") {
                 break;
             }
-            processCommand(command, data);
+            processCommand(command, player);
         }
 
         std::cout << std::endl;
