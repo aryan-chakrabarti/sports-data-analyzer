@@ -53,10 +53,28 @@ void printTable(const pfrscraper::DataTable<std::string>& table,
     }
 }
 
-void processCommand(const std::string& command, PlayerData& data) {
+std::string removeExtraWhitespace(const std::string& str) {
+    bool lastWasSpace(true);
+    std::ostringstream output;
+    for (const auto& c : str) {
+        if (c == ' ' || c == '\t') {
+            if (!lastWasSpace) {
+                output << c;
+            }
+            lastWasSpace = true;
+        } else {
+            output << c;
+            lastWasSpace = false;
+        }
+    }
+    return output.str();
+}
+
+void processCommand(std::string command, PlayerData& data) {
+    std::string cleanedCommand(removeExtraWhitespace(command));
+    boost::to_lower(cleanedCommand);
     std::vector<std::string> parsedArgs;
-    boost::split(parsedArgs, boost::to_lower_copy(command),
-                 boost::is_any_of("\t "));
+    boost::split(parsedArgs, cleanedCommand, boost::is_any_of("\t "));
     if (parsedArgs.size() == 0) {
         return;
     }
@@ -75,6 +93,11 @@ void processCommand(const std::string& command, PlayerData& data) {
                "COL (shows one stat over a period of time). Default is by row "
                "(ROW).\n";
     } else if (function == "load") {
+        if (parsedArgs.size() < 3) {
+            std::cerr << "Please enter a player's first and last name."
+                      << std::endl;
+            return;
+        }
         std::string joinedArgs(boost::algorithm::join(
             std::vector<std::string>(parsedArgs.begin() + 1, parsedArgs.end()),
             " "));
@@ -134,6 +157,7 @@ void processCommand(const std::string& command, PlayerData& data) {
 
     } else {
         std::cerr << "ERROR: Invalid command. Please try again." << std::endl;
+        return;
     }
     std::cout << "\n";
 }
