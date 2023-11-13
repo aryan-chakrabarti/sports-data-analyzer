@@ -54,13 +54,14 @@ void printTable(const pfrscraper::DataTable<std::string>& table,
 }
 
 void processCommand(const std::string& command, PlayerData& data) {
+    std::string lowerCasedCommand(command);
+    boost::to_lower(lowerCasedCommand);
     std::vector<std::string> parsedArgs;
-    boost::split(parsedArgs, command, boost::is_any_of("\t "));
+    boost::split(parsedArgs, lowerCasedCommand, boost::is_any_of("\t "));
     if (parsedArgs.size() == 0) {
         return;
     }
     std::string function(parsedArgs.at(0));
-    boost::to_lower(function);
     if (function == "help" || function == "h") {
         std::cout
             << "Functions:\n\nLOAD [Player Name]: Loads the player with "
@@ -70,7 +71,7 @@ void processCommand(const std::string& command, PlayerData& data) {
                "[Table Name] [View Option = ROW]: Gets the table with name "
                "'Table Name'. "
                "This name can be found with the 'SHOW' function. Optionally "
-               "select where to see the datapoints categorized by ROW (shows "
+               "select whether to see the datapoints categorized by ROW (shows "
                "stats for a specific point in time) or "
                "COL (shows one stat over a period of time). Default is by row "
                "(ROW).\n";
@@ -155,7 +156,8 @@ int main(int argc, char** argv) {
     } else if (argc == 1) {
         std::cout
             << "Welcome to the football player data analyzer.\nStart with the "
-               "'LOAD' command to load a player's info.\nType 'HELP' for help, "
+               "'LOAD' command to load a player's info.\nType 'HELP' or 'h' "
+               "for help, "
                "'q' to quit.\n";
         PlayerData data;
         while (true) {
