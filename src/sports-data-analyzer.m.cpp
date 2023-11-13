@@ -74,7 +74,7 @@ void processCommand(std::string command, PlayerData& data) {
     std::string cleanedCommand(removeExtraWhitespace(command));
     boost::to_lower(cleanedCommand);
     std::vector<std::string> parsedArgs;
-    boost::split(parsedArgs, cleanedCommand, boost::is_any_of("\t "));
+    boost::split(parsedArgs, cleanedCommand, boost::is_any_of(" "));
     if (parsedArgs.size() == 0) {
         return;
     }
